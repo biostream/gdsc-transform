@@ -102,6 +102,27 @@ cell_info_file = sys.argv[2]
 compound_info_file = sys.argv[3]
 raw_file = sys.argv[4]
 fitted_file = sys.argv[5]
+pubchem_file = sys.argv[6]
+
+
+pubchem_table = {}
+with open(pubchem_file) as handle:
+    for line in handle:
+        row = line.rstrip().split("\t")
+        if row[1] == "none":
+            pubchem_table[row[0]] = "compound:%s" % row[1]
+        else:
+            pubchem_table[row[0]] = "pubchem:%s" % row[1]
+
+compound_table = {}
+"""
+comp_info = pandas.read_excel(conv_file, sheetname=1, index_col=0)
+for row in comp_info.iterrows():
+    compound_table[int(row[0])] = row[1]['GDSC name']
+"""
+comp_info = pandas.read_excel(compound_info_file, index_col=0)
+for row in comp_info.iterrows():
+    compound_table[int(row[0])] = pubchem_table[str(row[1]['Drug Name'])]
 
 
 e = Emiter("gdsc.scan")
@@ -117,18 +138,6 @@ for row in cl_info.iterrows():
     if row[0] not in sample_table:
         sample_table[row[0]] = "biosample:GDSC:%s" % (row[1]['Sample Name'])
         gdsc_cell_info(row[1], e.emit)
-
-
-
-compound_table = {}
-"""
-comp_info = pandas.read_excel(conv_file, sheetname=1, index_col=0)
-for row in comp_info.iterrows():
-    compound_table[int(row[0])] = row[1]['GDSC name']
-"""
-comp_info = pandas.read_excel(compound_info_file, index_col=0)
-for row in comp_info.iterrows():
-    compound_table[int(row[0])] = "compound:%s" % (row[1]['Drug Name'])
 
 
 raw = pandas.read_excel(raw_file)
