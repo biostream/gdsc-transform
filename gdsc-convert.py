@@ -4,7 +4,7 @@ import sys
 import pandas
 import math
 import json
-from bmeg import phenotype_pb2
+from ga4gh import phenotype_pb2
 from google.protobuf import json_format
 from ga4gh import bio_metadata_pb2
 
@@ -15,7 +15,7 @@ def proto_list_append(message, a):
 def gdsc_ic50_row(row, compound_table, sample_table, emit):
     sample_name = sample_table[row["COSMIC_ID"]]
     compound_name = compound_table[ int(row["DRUG_ID"]) ]
-    
+
     gid = "responseCurve:%s:%s" % (sample_name, compound_name)
 
     response = phenotype_pb2.ResponseCurve()
@@ -33,14 +33,14 @@ def gdsc_ic50_row(row, compound_table, sample_table, emit):
     s.type = phenotype_pb2.ResponseSummary.AUC
     s.value = row['AUC']
     s.unit = "uM"
-    
+
     s = response.summary.add()
     s.type = phenotype_pb2.ResponseSummary.RMSE
     s.value = row['RMSE']
     s.unit = "uM"
-    
+
     dose = row['MAX_CONC']
-    
+
     dr = response.values.add()
     dr.dose = dose
     dr.response = row['raw_max']
@@ -49,7 +49,7 @@ def gdsc_ic50_row(row, compound_table, sample_table, emit):
         dr = response.values.add()
         dr.dose = dose
         dr.response = row['raw%d' % (i) ]
-    
+
     for i in range(1,49):
         v = row['control%d' % i]
         try:
@@ -92,7 +92,7 @@ class Emiter:
         if message.DESCRIPTOR.full_name not in self.handles:
             self.handles[message.DESCRIPTOR.full_name] = open("%s.%s.json" % (self.path, message.DESCRIPTOR.full_name), "w")
         self.handles[message.DESCRIPTOR.full_name].write(json.dumps(msg) + "\n")
-    
+
     def close(self):
         for v in self.handles.values():
             v.close()
@@ -117,9 +117,9 @@ for row in cl_info.iterrows():
     if row[0] not in sample_table:
         sample_table[row[0]] = "biosample:GDSC:%s" % (row[1]['Sample Name'])
         gdsc_cell_info(row[1], e.emit)
-        
 
-    
+
+
 compound_table = {}
 """
 comp_info = pandas.read_excel(conv_file, sheetname=1, index_col=0)
@@ -140,6 +140,3 @@ for r in merge.iterrows():
     cosmic_id = int(r[1]["COSMIC_ID"])
     if cosmic_id in cl_info.index:
         gdsc_ic50_row( r[1], compound_table, sample_table, e.emit )
-        
-        
-
