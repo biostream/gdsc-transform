@@ -110,7 +110,7 @@ with open(pubchem_file) as handle:
     for line in handle:
         row = line.rstrip().split("\t")
         if row[1] == "none":
-            pubchem_table[row[0]] = "compound:%s" % row[1]
+            pubchem_table[row[0]] = "compound:%s" % row[0]
         else:
             pubchem_table[row[0]] = "pubchem:%s" % row[1]
 
