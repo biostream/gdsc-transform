@@ -7,6 +7,7 @@ from bmeg import matrix_pb2
 from google.protobuf import json_format
 import numpy as np
 
+# curl -O ftp://ftp.sanger.ac.uk/pub/project/cancerrxgene/releases/release-6.0/sanger1018_brainarray_ensemblgene_rma.txt.gz
 
 def message_to_json(message):
     msg = json.loads(json_format.MessageToJson(message))
@@ -25,7 +26,7 @@ for row in cl_info.iterrows():
 cl_info = pandas.read_excel(sys.argv[2], index_col=0)
 gdsc_sample_table = {}
 for row in cl_info.iterrows():
-    gdsc_sample_table[ "%0.f" % (row[1]["COSMIC identifier"]) ] = "biosample:GDSC:%s" % (row[0])
+    gdsc_sample_table[ "%0.f" % (row[1]["COSMIC identifier"]) ] = "gdsc:%s" % (row[0])
 
 df = pandas.read_csv(sys.argv[1], sep="\t", index_col=0)
 df = df[ np.invert(pandas.isnull(df.index)) ].drop('GENE_title', 1)

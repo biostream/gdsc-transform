@@ -16,7 +16,7 @@ def gdsc_ic50_row(row, compound_table, sample_table, emit):
     sample_name = sample_table[row["COSMIC_ID"]]
     compound_name = compound_table[ int(row["DRUG_ID"]) ]
 
-    gid = "responseCurve:%s:%s" % (sample_name, compound_name)
+    gid = "gdsc-response:%s/%s" % (sample_name, compound_name)
 
     response = phenotype_pb2.ResponseCurve()
     response.gid = gid
@@ -68,7 +68,7 @@ def gdsc_ic50_row(row, compound_table, sample_table, emit):
 
 def gdsc_cell_info(row, emit):
     sample = bio_metadata_pb2.Biosample()
-    sample.id = "biosample:GDSC:%s" % row["Sample Name"]
+    sample.id = "gdsc:%s" % row["Sample Name"]
     sample.dataset_id = "GDSC"
 
     dis = row['GDSC\nTissue\ndescriptor 2']
@@ -131,12 +131,12 @@ e = Emiter("gdsc.scan")
 cl_info = pandas.read_excel(conv_file, index_col=0)
 sample_table = {}
 for row in cl_info.iterrows():
-    sample_table[row[0]] = "biosample:CCLE:%s" % (row[1]['CCLE name'])
+    sample_table[row[0]] = "ccle:%s" % (row[1]['CCLE name'])
 
 cl_info = pandas.read_excel(cell_info_file, index_col=1)
 for row in cl_info.iterrows():
     if row[0] not in sample_table:
-        sample_table[row[0]] = "biosample:GDSC:%s" % (row[1]['Sample Name'])
+        sample_table[row[0]] = "gdsc:%s" % (row[1]['Sample Name'])
         gdsc_cell_info(row[1], e.emit)
 
 
