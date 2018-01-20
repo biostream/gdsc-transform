@@ -1,6 +1,6 @@
-FROM ubuntu:17.04
+FROM python:2.7.14
 
-RUN apt-get update && apt-get install -y python-pip python-pandas
+RUN pip install pandas
 RUN pip install protobuf
 
 COPY *.py /opt/
