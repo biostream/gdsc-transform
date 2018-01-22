@@ -2,6 +2,7 @@ FROM python:2.7.14
 
 RUN pip install pandas
 RUN pip install protobuf
+RUN pip install xlrd
 
 COPY *.py /opt/
 COPY gdsc_pubchem.table /opt/
