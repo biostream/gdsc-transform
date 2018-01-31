@@ -13,16 +13,21 @@ def proto_list_append(message, a):
     v.string_value = a
 
 def gdsc_ic50_row(row, compound_table, sample_table, emit):
-    sample_name = sample_table[row["COSMIC_ID"]]
+    sample_name, source = sample_table[row["COSMIC_ID"]]
     compound_name = compound_table[ int(row["DRUG_ID"]) ]
 
     gid = "gdsc-response:%s/%s" % (sample_name, compound_name)
 
     response = phenotype_pb2.ResponseCurve()
-    response.gid = gid
+    # response.gid = gid
+    response.source = source
     response.responseType = phenotype_pb2.ResponseCurve.ACTIVITY
-    response.compound = compound_name
+    # response.compound = compound_name
     response.sample = sample_name
+
+    compound = response.compounds.add()
+    compound.ratio = 1.0
+    compound.compound = compound_name
 
     s = response.summary.add()
     s.type = phenotype_pb2.ResponseSummary.IC50
@@ -68,8 +73,8 @@ def gdsc_ic50_row(row, compound_table, sample_table, emit):
 
 def gdsc_cell_info(row, emit):
     sample = bio_metadata_pb2.Biosample()
-    sample.id = "gdsc:%s" % row["Sample Name"]
-    sample.dataset_id = "GDSC"
+    sample.id = row["Sample Name"] # "gdsc:%s" % row["Sample Name"]
+    sample.dataset_id = "gdsc"
 
     dis = row['GDSC\nTissue\ndescriptor 2']
     if not isinstance(dis, float):
@@ -110,9 +115,9 @@ with open(pubchem_file) as handle:
     for line in handle:
         row = line.rstrip().split("\t")
         if row[1] == "none":
-            pubchem_table[row[0]] = "compound:%s" % row[0]
+            pubchem_table[row[0]] = row[0] # "compound:%s" % row[0]
         else:
-            pubchem_table[row[0]] = "pubchem:%s" % row[1]
+            pubchem_table[row[0]] = row[1] # "pubchem:%s" % row[1]
 
 compound_table = {}
 """
@@ -131,14 +136,13 @@ e = Emiter("gdsc.scan")
 cl_info = pandas.read_excel(conv_file, index_col=0)
 sample_table = {}
 for row in cl_info.iterrows():
-    sample_table[row[0]] = "ccle:%s" % (row[1]['CCLE name'])
+    sample_table[row[0]] = (row[1]['CCLE name'], 'ccle') # "ccle:%s" % (row[1]['CCLE name'])
 
 cl_info = pandas.read_excel(cell_info_file, index_col=1)
 for row in cl_info.iterrows():
     if row[0] not in sample_table:
-        sample_table[row[0]] = "gdsc:%s" % (row[1]['Sample Name'])
+        sample_table[row[0]] = (row[1]['Sample Name'], 'gdsc') # "gdsc:%s" % (row[1]['Sample Name'])
         gdsc_cell_info(row[1], e.emit)
-
 
 raw = pandas.read_excel(raw_file)
 fitted = pandas.read_excel(fitted_file)
