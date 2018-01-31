@@ -4,7 +4,7 @@ import sys
 import pandas
 import math
 import json
-import phenotype_pb2
+from bmeg import phenotype_pb2
 from google.protobuf import json_format
 from ga4gh import bio_metadata_pb2
 
