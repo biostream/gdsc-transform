@@ -115,9 +115,9 @@ with open(pubchem_file) as handle:
     for line in handle:
         row = line.rstrip().split("\t")
         if row[1] == "none":
-            pubchem_table[row[0]] = row[0] # "compound:%s" % row[0]
+            pubchem_table[row[0]] = str(row[0]) # "compound:%s" % row[0]
         else:
-            pubchem_table[row[0]] = row[1] # "pubchem:%s" % row[1]
+            pubchem_table[row[0]] = str(row[1]) # "pubchem:%s" % row[1]
 
 compound_table = {}
 """
@@ -136,12 +136,12 @@ e = Emiter("gdsc.scan")
 cl_info = pandas.read_excel(conv_file, index_col=0)
 sample_table = {}
 for row in cl_info.iterrows():
-    sample_table[row[0]] = (row[1]['CCLE name'], 'ccle') # "ccle:%s" % (row[1]['CCLE name'])
+    sample_table[row[0]] = (str(row[1]['CCLE name']), 'ccle') # "ccle:%s" % (row[1]['CCLE name'])
 
 cl_info = pandas.read_excel(cell_info_file, index_col=1)
 for row in cl_info.iterrows():
     if row[0] not in sample_table:
-        sample_table[row[0]] = (row[1]['Sample Name'], 'gdsc') # "gdsc:%s" % (row[1]['Sample Name'])
+        sample_table[row[0]] = (str(row[1]['Sample Name']), 'gdsc') # "gdsc:%s" % (row[1]['Sample Name'])
         gdsc_cell_info(row[1], e.emit)
 
 raw = pandas.read_excel(raw_file)
