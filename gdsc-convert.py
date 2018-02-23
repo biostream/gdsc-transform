@@ -4,7 +4,7 @@ import sys
 import pandas
 import math
 import json
-from bmeg import phenotype_pb2
+from bmeg import phenotype_pb2, conversions
 from google.protobuf import json_format
 from ga4gh import bio_metadata_pb2
 
@@ -127,7 +127,8 @@ for row in comp_info.iterrows():
 """
 comp_info = pandas.read_excel(compound_info_file, index_col=0)
 for row in comp_info.iterrows():
-    compound_table[int(row[0])] = pubchem_table[str(row[1]['Drug Name'])]
+    compound_table[int(row[0])] = conversions.pubchem(str(row[1]['Drug Name']))
+    # compound_table[int(row[0])] = pubchem_table[str(row[1]['Drug Name'])]
 
 
 e = Emiter("gdsc.scan")
